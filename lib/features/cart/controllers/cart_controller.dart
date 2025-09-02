@@ -330,15 +330,17 @@ class CartController extends GetxController {
         print('➕ Adding new item to cart...');
 
         // Add to local list FIRST
+        print('🔍 About to call _cleanCartItem with product: $product');
         final cleanedProduct = _cleanCartItem({
           'id': productId,
           'productId': productId,
-          'product': product,
+          'product': product, // This should already be properly formatted
           'quantity': quantity,
           'selectedSize': selectedSize ?? '',
           'selectedColor': selectedColor ?? '',
           'addedAt': DateTime.now().toIso8601String(),
         });
+        print('🔍 _cleanCartItem result: $cleanedProduct');
 
         _cartItems.add(cleanedProduct);
         print('✅ Added to cart locally: ${cleanedProduct['name']}');

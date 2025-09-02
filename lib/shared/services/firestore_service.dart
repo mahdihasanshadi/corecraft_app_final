@@ -159,7 +159,7 @@ class FirestoreService {
     int quantity,
   ) async {
     try {
-      // First get the product details
+      // Get product from Firestore
       final product = await getProductById(productId);
       if (product == null) {
         print('Product not found: $productId');

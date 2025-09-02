@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../../cart/controllers/cart_controller.dart';
+import '../../../shared/services/firestore_service.dart';
+import '../../product/models/firestore_product.dart';
 
 class AllProductsView extends StatefulWidget {
   const AllProductsView({super.key});
@@ -17,210 +19,27 @@ class _AllProductsViewState extends State<AllProductsView> {
   String _selectedSortBy = 'Name A-Z';
   bool _showFilters = false;
 
-  final List<Map<String, dynamic>> _allProducts = [
-    // Streetwear Products
-    {
-      'id': 'sw1',
-      'name': 'Oversized Streetwear Hoodie',
-      'price': 1299.00,
-      'originalPrice': 1499.00,
-      'category': 'Streetwear',
-      'image':
-          'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400',
-      'rating': 4.8,
-      'reviews': 124,
-      'inStock': true,
-    },
-    {
-      'id': 'sw2',
-      'name': 'Cargo Streetwear Pants',
-      'price': 1499.00,
-      'originalPrice': null,
-      'category': 'Streetwear',
-      'image':
-          'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400',
-      'rating': 4.6,
-      'reviews': 89,
-      'inStock': true,
-    },
-    {
-      'id': 'sw3',
-      'name': 'Graphic Streetwear T-Shirt',
-      'price': 699.00,
-      'originalPrice': 899.00,
-      'category': 'Streetwear',
-      'image':
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-      'rating': 4.6,
-      'reviews': 156,
-      'inStock': true,
-    },
-    {
-      'id': 'sw4',
-      'name': 'Streetwear Denim Jacket',
-      'price': 2199.00,
-      'originalPrice': null,
-      'category': 'Streetwear',
-      'image':
-          'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=400',
-      'rating': 4.7,
-      'reviews': 67,
-      'inStock': false,
-    },
-    {
-      'id': 'sw5',
-      'name': 'Streetwear Track Pants',
-      'price': 1199.00,
-      'originalPrice': 1399.00,
-      'category': 'Streetwear',
-      'image':
-          'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400',
-      'rating': 4.4,
-      'reviews': 92,
-      'inStock': true,
-    },
-    // Casual Shirts Products
-    {
-      'id': 'cs1',
-      'name': 'Classic Oxford Casual Shirt',
-      'price': 899.00,
-      'originalPrice': 1099.00,
-      'category': 'Casual Shirts',
-      'image':
-          'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
-      'rating': 4.6,
-      'reviews': 203,
-      'inStock': true,
-    },
-    {
-      'id': 'cs2',
-      'name': 'Linen Summer Casual Shirt',
-      'price': 1099.00,
-      'originalPrice': null,
-      'category': 'Casual Shirts',
-      'image':
-          'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400',
-      'rating': 4.5,
-      'reviews': 178,
-      'inStock': true,
-    },
-    {
-      'id': 'cs3',
-      'name': 'Polo Casual Shirt',
-      'price': 699.00,
-      'originalPrice': 899.00,
-      'category': 'Casual Shirts',
-      'image':
-          'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400',
-      'rating': 4.5,
-      'reviews': 145,
-      'inStock': true,
-    },
-    {
-      'id': 'cs4',
-      'name': 'Denim Casual Shirt',
-      'price': 1199.00,
-      'originalPrice': null,
-      'category': 'Casual Shirts',
-      'image':
-          'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=400',
-      'rating': 4.3,
-      'reviews': 87,
-      'inStock': false,
-    },
-    {
-      'id': 'cs5',
-      'name': 'Flannel Casual Shirt',
-      'price': 999.00,
-      'originalPrice': 1199.00,
-      'category': 'Casual Shirts',
-      'image':
-          'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400',
-      'rating': 4.3,
-      'reviews': 134,
-      'inStock': true,
-    },
-    // Jerseys Products
-    {
-      'id': 'jr1',
-      'name': 'Pro Basketball Jersey',
-      'price': 1199.00,
-      'originalPrice': 1399.00,
-      'category': 'Jerseys',
-      'image':
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      'rating': 4.7,
-      'reviews': 267,
-      'inStock': true,
-    },
-    {
-      'id': 'jr2',
-      'name': 'Soccer Team Jersey',
-      'price': 999.00,
-      'originalPrice': null,
-      'category': 'Jerseys',
-      'image':
-          'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
-      'rating': 4.6,
-      'reviews': 189,
-      'inStock': true,
-    },
-    {
-      'id': 'jr3',
-      'name': 'Football Jersey',
-      'price': 1299.00,
-      'originalPrice': 1499.00,
-      'category': 'Jerseys',
-      'image':
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      'rating': 4.6,
-      'reviews': 156,
-      'inStock': true,
-    },
-    {
-      'id': 'jr4',
-      'name': 'Baseball Jersey',
-      'price': 1099.00,
-      'originalPrice': null,
-      'category': 'Jerseys',
-      'image':
-          'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
-      'rating': 4.4,
-      'reviews': 98,
-      'inStock': false,
-    },
-    {
-      'id': 'jr5',
-      'name': 'Hockey Jersey',
-      'price': 1399.00,
-      'originalPrice': 1599.00,
-      'category': 'Jerseys',
-      'image':
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      'rating': 4.8,
-      'reviews': 76,
-      'inStock': true,
-    },
-  ];
+  final List<FirestoreProduct> _allProducts = [];
+  bool _isLoading = true;
+  String? _error;
 
-  List<Map<String, dynamic>> get _filteredProducts {
-    List<Map<String, dynamic>> filtered = _allProducts.where((product) {
+  List<FirestoreProduct> get _filteredProducts {
+    List<FirestoreProduct> filtered = _allProducts.where((product) {
       // Search by name
       bool matchesSearch =
           _searchController.text.isEmpty ||
-          product['name'].toString().toLowerCase().contains(
+          product.name.toLowerCase().contains(
             _searchController.text.toLowerCase(),
           );
 
       // Filter by category
       bool matchesCategory =
-          _selectedCategory == 'All' ||
-          product['category'] == _selectedCategory;
+          _selectedCategory == 'All' || product.category == _selectedCategory;
 
       // Filter by price range
       bool matchesPrice =
-          product['price'] >= _priceRange.start &&
-          product['price'] <= _priceRange.end;
+          product.price >= _priceRange.start &&
+          product.price <= _priceRange.end;
 
       return matchesSearch && matchesCategory && matchesPrice;
     }).toList();
@@ -228,19 +47,19 @@ class _AllProductsViewState extends State<AllProductsView> {
     // Sort products
     switch (_selectedSortBy) {
       case 'Name A-Z':
-        filtered.sort((a, b) => a['name'].compareTo(b['name']));
+        filtered.sort((a, b) => a.name.compareTo(b.name));
         break;
       case 'Name Z-A':
-        filtered.sort((a, b) => b['name'].compareTo(a['name']));
+        filtered.sort((a, b) => b.name.compareTo(a.name));
         break;
       case 'Price Low to High':
-        filtered.sort((a, b) => a['price'].compareTo(b['price']));
+        filtered.sort((a, b) => a.price.compareTo(b.price));
         break;
       case 'Price High to Low':
-        filtered.sort((a, b) => b['price'].compareTo(a['price']));
+        filtered.sort((a, b) => b.price.compareTo(a.price));
         break;
       case 'Rating High to Low':
-        filtered.sort((a, b) => b['rating'].compareTo(a['rating']));
+        filtered.sort((a, b) => b.rating.compareTo(a.rating));
         break;
       case 'Newest First':
         // For demo, we'll keep original order
@@ -251,9 +70,36 @@ class _AllProductsViewState extends State<AllProductsView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final products = await FirestoreService.getProducts();
+      setState(() {
+        _allProducts.clear();
+        _allProducts.addAll(products);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load products: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -307,7 +153,11 @@ class _AllProductsViewState extends State<AllProductsView> {
           if (_showFilters) _buildFilters(),
           _buildResultsHeader(),
           Expanded(
-            child: _filteredProducts.isEmpty
+            child: _isLoading
+                ? _buildLoadingState()
+                : _error != null
+                ? _buildErrorState()
+                : _filteredProducts.isEmpty
                 ? _buildEmptyState()
                 : _buildProductsGrid(),
           ),
@@ -318,7 +168,7 @@ class _AllProductsViewState extends State<AllProductsView> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(16),
       child: TextField(
         controller: _searchController,
         onChanged: (value) => setState(() {}),
@@ -338,16 +188,20 @@ class _AllProductsViewState extends State<AllProductsView> {
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey[200]!),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: Color(0xFF2C3E50), width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
           ),
         ),
       ),
@@ -356,15 +210,15 @@ class _AllProductsViewState extends State<AllProductsView> {
 
   Widget _buildFilters() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -376,24 +230,24 @@ class _AllProductsViewState extends State<AllProductsView> {
             'Filters',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 16,
               color: const Color(0xFF2C3E50),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Category Filter
           Text(
             'Category',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey[700],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Wrap(
-            spacing: 8,
+            spacing: 6,
             children: ['All', 'Streetwear', 'Casual Shirts', 'Jerseys']
                 .map(
                   (category) => FilterChip(
@@ -412,18 +266,18 @@ class _AllProductsViewState extends State<AllProductsView> {
                 )
                 .toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Price Range Filter
           Text(
             'Price Range: ৳${_priceRange.start.round()} - ৳${_priceRange.end.round()}',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey[700],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           RangeSlider(
             values: _priceRange,
             min: 0,
@@ -441,18 +295,18 @@ class _AllProductsViewState extends State<AllProductsView> {
               });
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Sort By Filter
           Text(
             'Sort By',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 16,
+              fontSize: 14,
               color: Colors.grey[700],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             value: _selectedSortBy,
             decoration: InputDecoration(
@@ -527,12 +381,12 @@ class _AllProductsViewState extends State<AllProductsView> {
 
   Widget _buildProductsGrid() {
     return GridView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.85,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.75,
       ),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
@@ -542,7 +396,7 @@ class _AllProductsViewState extends State<AllProductsView> {
     );
   }
 
-  Widget _buildProductCard(Map<String, dynamic> product) {
+  Widget _buildProductCard(FirestoreProduct product) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -568,14 +422,14 @@ class _AllProductsViewState extends State<AllProductsView> {
                   top: Radius.circular(16),
                 ),
                 image: DecorationImage(
-                  image: NetworkImage(product['image']),
+                  image: NetworkImage(product.mainImage),
                   fit: BoxFit.cover,
                 ),
               ),
               child: Stack(
                 children: [
                   // Out of Stock Overlay
-                  if (!product['inStock'])
+                  if (product.stock <= 0)
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.6),
@@ -620,61 +474,57 @@ class _AllProductsViewState extends State<AllProductsView> {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Product details
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // Product Name
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  // Category and Rating in one row
+                  Row(
                     children: [
-                      // Product Name
-                      Text(
-                        product['name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                      Expanded(
+                        child: Text(
+                          product.category ?? 'Unknown',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 9,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
-
-                      // Category and Rating in one row
-                      Row(
-                        children: [
-                          Text(
-                            product['category'],
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 10,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(Icons.star, size: 12, color: Colors.amber[600]),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${product['rating']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-
-                      // Price
+                      const SizedBox(width: 4),
+                      Icon(Icons.star, size: 10, color: Colors.amber[600]),
+                      const SizedBox(width: 1),
                       Text(
-                        '৳${product['price'].toStringAsFixed(0)}',
+                        '${product.rating}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Color(0xFF2C3E50),
+                          fontSize: 9,
                         ),
                       ),
                     ],
+                  ),
+
+                  // Price
+                  Text(
+                    '৳${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: Color(0xFF2C3E50),
+                    ),
                   ),
                 ],
               ),
@@ -684,29 +534,29 @@ class _AllProductsViewState extends State<AllProductsView> {
           // Add to Cart Button
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Obx(() {
               final cartController = Get.find<CartController>();
-              final isLoading = cartController.isProductLoading(product['id']);
+              final isLoading = cartController.isProductLoading(product.id);
 
               return ElevatedButton(
-                onPressed: (product['inStock'] && !isLoading)
+                onPressed: (product.stock > 0 && !isLoading)
                     ? () => _addToCart(product)
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (product['inStock'] && !isLoading)
+                  backgroundColor: (product.stock > 0 && !isLoading)
                       ? const Color(0xFF2C3E50)
                       : Colors.grey[400],
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                 ),
                 child: isLoading
                     ? const SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 14,
+                        height: 14,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -715,14 +565,82 @@ class _AllProductsViewState extends State<AllProductsView> {
                         ),
                       )
                     : Text(
-                        product['inStock'] ? 'Add to Cart' : 'Out of Stock',
+                        product.stock > 0 ? 'Add to Cart' : 'Out of Stock',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
               );
             }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2C3E50)),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading products...',
+            style: TextStyle(fontSize: 16, color: Color(0xFF2C3E50)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.red[100],
+              borderRadius: BorderRadius.circular(60),
+            ),
+            child: Icon(Icons.error_outline, size: 60, color: Colors.red[400]),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Error Loading Products',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.red[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _error ?? 'Something went wrong',
+            style: TextStyle(color: Colors.red[500], fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _loadProducts,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2C3E50),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Retry',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -785,10 +703,10 @@ class _AllProductsViewState extends State<AllProductsView> {
     );
   }
 
-  void _addToWishlist(Map<String, dynamic> product) {
+  void _addToWishlist(FirestoreProduct product) {
     Get.snackbar(
       'Wishlist',
-      '${product['name']} added to wishlist',
+      '${product.name} added to wishlist',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,
@@ -796,9 +714,40 @@ class _AllProductsViewState extends State<AllProductsView> {
     );
   }
 
-  void _addToCart(Map<String, dynamic> product) {
-    final cartController = Get.find<CartController>();
-    cartController.addToCart(product);
-    // The controller will handle snackbar and database sync
+  void _addToCart(FirestoreProduct product) {
+    try {
+      // Check if CartController is available
+      if (!Get.isRegistered<CartController>()) {
+        Get.snackbar(
+          'Error',
+          'Cart service not available',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+      }
+
+      final cartController = Get.find<CartController>();
+
+      // Convert FirestoreProduct to Map for CartController
+      final productMap = product.toMap();
+
+      print('🔍 Adding to cart: ${product.name}');
+
+      cartController.addToCart(productMap);
+      print('✅ Product added to cart: ${product.name}');
+    } catch (e) {
+      print('❌ Error adding to cart: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to add item to cart',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 }
