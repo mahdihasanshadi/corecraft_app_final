@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/user_profile.dart';
 import '../../../shared/services/firestore_service.dart';
+import 'firebase_auth_controller.dart';
 
 class UserProfileController extends GetxController {
   static UserProfileController get to => Get.find();
@@ -24,9 +25,23 @@ class UserProfileController extends GetxController {
   }
 
   Future<void> _loadUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await loadUserProfile(user.uid);
+    try {
+      // Wait for FirebaseAuthController to be ready
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        print('⏳ Waiting for FirebaseAuthController to be registered...');
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (!Get.isRegistered<FirebaseAuthController>()) {
+          print('❌ FirebaseAuthController not registered, cannot load profile');
+          return;
+        }
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+      if (authController.isLoggedIn) {
+        await loadUserProfile(authController.currentUser!.uid);
+      }
+    } catch (e) {
+      print('❌ Error in _loadUserProfile: $e');
     }
   }
 
@@ -59,11 +74,20 @@ class UserProfileController extends GetxController {
   }) async {
     try {
       _isLoading.value = true;
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      // Get user from FirebaseAuthController
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        Get.snackbar('Error', 'Authentication service not ready');
+        return;
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+      if (!authController.isLoggedIn) {
         Get.snackbar('Error', 'User not logged in');
         return;
       }
+
+      final user = authController
+          .currentUser!; // Safe to use ! here since we checked isLoggedIn
 
       final updates = <String, dynamic>{};
       if (name != null) updates['name'] = name;

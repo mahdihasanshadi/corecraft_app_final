@@ -19,8 +19,48 @@ class OrdersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadUserOrders();
-    _setupRealtimeListener();
+    // Wait for auth controller to be ready before loading orders
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _waitForAuthAndLoadOrders();
+    });
+  }
+
+  Future<void> _waitForAuthAndLoadOrders() async {
+    try {
+      // Wait for FirebaseAuthController to be registered and initialized
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        print('⏳ Waiting for FirebaseAuthController to be registered...');
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (!Get.isRegistered<FirebaseAuthController>()) {
+          print(
+            '❌ FirebaseAuthController still not registered, cannot load orders',
+          );
+          _error.value = 'Authentication service not ready';
+          return;
+        }
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+
+      // Wait for auth controller to finish initializing
+      if (authController.isLoading) {
+        print('⏳ Waiting for FirebaseAuthController to finish initializing...');
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      // Now check if user is authenticated
+      if (authController.isLoggedIn) {
+        print('✅ User is authenticated, loading orders...');
+        await loadUserOrders();
+        _setupRealtimeListener();
+      } else {
+        print('ℹ️ User not authenticated, cannot load orders');
+        _error.value = 'Please login to view orders';
+      }
+    } catch (e) {
+      print('❌ Error in _waitForAuthAndLoadOrders: $e');
+      _error.value = 'Failed to initialize orders service';
+    }
   }
 
   void _setupRealtimeListener() {

@@ -45,9 +45,9 @@ class OrdersView extends StatelessWidget {
                 children: [
                   // Header
                   _buildHeader(controller),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Orders List
                   _buildOrdersList(controller),
                 ],
@@ -74,13 +74,10 @@ class OrdersView extends StatelessWidget {
         const SizedBox(height: 8),
         const Text(
           'Track your order history and status',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
+          style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
         const SizedBox(height: 20),
-        
+
         // Order Stats
         Row(
           children: [
@@ -113,7 +110,7 @@ class OrdersView extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -124,7 +121,7 @@ class OrdersView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -164,7 +161,9 @@ class OrdersView extends StatelessWidget {
     }
 
     return Column(
-      children: controller.orders.map((order) => _buildOrderCard(order)).toList(),
+      children: controller.orders
+          .map((order) => _buildOrderCard(order))
+          .toList(),
     );
   }
 
@@ -173,11 +172,7 @@ class OrdersView extends StatelessWidget {
       padding: const EdgeInsets.all(40),
       child: Column(
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.red,
-          ),
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 16),
           const Text(
             'Error Loading Orders',
@@ -191,10 +186,7 @@ class OrdersView extends StatelessWidget {
           Text(
             controller.error ?? 'Unknown error occurred',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -215,11 +207,7 @@ class OrdersView extends StatelessWidget {
       padding: const EdgeInsets.all(40),
       child: Column(
         children: [
-          const Icon(
-            Icons.shopping_bag_outlined,
-            size: 64,
-            color: Colors.grey,
-          ),
+          const Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           const Text(
             'No Orders Yet',
@@ -233,10 +221,7 @@ class OrdersView extends StatelessWidget {
           const Text(
             'You haven\'t placed any orders yet.\nStart shopping to see your orders here!',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
@@ -260,7 +245,7 @@ class OrdersView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -298,9 +283,12 @@ class OrdersView extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(order.status).withOpacity(0.1),
+                    color: _getStatusColor(order.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -325,10 +313,10 @@ class OrdersView extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Order Items
           ...order.items.map((item) => _buildOrderItem(item)).toList(),
-          
+
           // Order Summary
           Container(
             padding: const EdgeInsets.all(16),
@@ -341,9 +329,18 @@ class OrdersView extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildSummaryRow('Subtotal', '৳${order.subtotal.toStringAsFixed(0)}'),
-                _buildSummaryRow('Delivery Charge', '৳${order.deliveryCharge.toStringAsFixed(0)}'),
-                _buildSummaryRow('VAT (5%)', '৳${order.vat.toStringAsFixed(0)}'),
+                _buildSummaryRow(
+                  'Subtotal',
+                  '৳${order.subtotal.toStringAsFixed(0)}',
+                ),
+                _buildSummaryRow(
+                  'Delivery Charge',
+                  '৳${order.deliveryCharge.toStringAsFixed(0)}',
+                ),
+                _buildSummaryRow(
+                  'VAT (5%)',
+                  '৳${order.vat.toStringAsFixed(0)}',
+                ),
                 const Divider(height: 20),
                 _buildSummaryRow(
                   'Total',
@@ -353,7 +350,7 @@ class OrdersView extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Action Buttons
           Padding(
             padding: const EdgeInsets.all(16),
@@ -426,10 +423,7 @@ class OrdersView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '${item.size} • ${item.color} • Qty: ${item.quantity}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
