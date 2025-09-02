@@ -3,13 +3,52 @@ import 'package:get/get.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../controllers/wishlist_controller.dart';
 
-class WishlistView extends StatelessWidget {
+class WishlistView extends StatefulWidget {
   const WishlistView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final wishlistController = Get.put(WishlistController());
+  State<WishlistView> createState() => _WishlistViewState();
+}
 
+class _WishlistViewState extends State<WishlistView>
+    with WidgetsBindingObserver {
+  late final WishlistController wishlistController;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    wishlistController = Get.put(WishlistController());
+
+    // Refresh wishlist when screen is first loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      wishlistController.refreshWishlist();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Refresh wishlist when app is resumed
+      wishlistController.refreshWishlist();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh wishlist when dependencies change (e.g., when returning to screen)
+    wishlistController.refreshWishlist();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E8),
       appBar: AppBar(
@@ -26,6 +65,10 @@ class WishlistView extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.black87),
+            onPressed: () => wishlistController.refreshWishlist(),
+          ),
           IconButton(
             icon: const Icon(
               Icons.shopping_cart_outlined,
@@ -79,13 +122,17 @@ class WishlistView extends StatelessWidget {
 
               return wishlistController.wishlistItems.isEmpty
                   ? _buildEmptyWishlist(context)
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: wishlistController.wishlistItems.length,
-                      itemBuilder: (context, index) {
-                        final item = wishlistController.wishlistItems[index];
-                        return _buildWishlistItem(context, item);
-                      },
+                  : RefreshIndicator(
+                      onRefresh: () => wishlistController.refreshWishlist(),
+                      color: const Color(0xFF4CAF50),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: wishlistController.wishlistItems.length,
+                        itemBuilder: (context, index) {
+                          final item = wishlistController.wishlistItems[index];
+                          return _buildWishlistItem(context, item);
+                        },
+                      ),
                     );
             }),
           ),
@@ -106,7 +153,7 @@ class WishlistView extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -169,7 +216,7 @@ class WishlistView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -295,7 +342,7 @@ class WishlistView extends StatelessWidget {
     if (image != null && image.toString().isNotEmpty) {
       return image.toString();
     }
-    
+
     // Try to get from 'images' array
     final images = item['images'];
     if (images is List && images.isNotEmpty) {
@@ -304,7 +351,7 @@ class WishlistView extends StatelessWidget {
         return firstImage.toString();
       }
     }
-    
+
     // Return default image
     return 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400';
   }

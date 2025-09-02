@@ -13,6 +13,11 @@ class WishlistController extends GetxController {
   bool get isLoading => _isLoading.value;
   bool get isProcessing => _isProcessing.value;
 
+  // Public method to refresh wishlist
+  Future<void> refreshWishlist() async {
+    await _loadWishlistItems();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -48,14 +53,18 @@ class WishlistController extends GetxController {
       final user = authController.currentUser;
 
       if (user != null) {
+        print('🔍 Loading wishlist for user: ${user.uid}');
         // Load wishlist from Firestore
         final wishlistData = await FirestoreService.getUserWishlist(user.uid);
+        print('📦 Raw wishlist data: ${wishlistData.length} items');
 
         // Validate and clean the data
         final cleanedData = wishlistData
             .map((item) => _cleanWishlistItem(item))
             .toList();
+        print('🧹 Cleaned wishlist data: ${cleanedData.length} items');
         _wishlistItems.value = cleanedData;
+        print('✅ Wishlist items updated: ${_wishlistItems.length}');
       } else {
         // User not logged in, clear wishlist
         _wishlistItems.clear();

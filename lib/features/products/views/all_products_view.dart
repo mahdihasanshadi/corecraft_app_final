@@ -4,6 +4,8 @@ import '../../../core/widgets/logo_widget.dart';
 import '../../cart/controllers/cart_controller.dart';
 import '../../../shared/services/firestore_service.dart';
 import '../../product/models/firestore_product.dart';
+import '../../auth/controllers/firebase_auth_controller.dart';
+import '../../wishlist/controllers/wishlist_controller.dart';
 
 class AllProductsView extends StatefulWidget {
   const AllProductsView({super.key});
@@ -386,7 +388,7 @@ class _AllProductsViewState extends State<AllProductsView> {
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 0.75,
+        childAspectRatio: 0.72,
       ),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
@@ -462,6 +464,11 @@ class _AllProductsViewState extends State<AllProductsView> {
                         icon: const Icon(Icons.favorite_border, size: 20),
                         onPressed: () => _addToWishlist(product),
                         color: Colors.red,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                       ),
                     ),
                   ),
@@ -474,17 +481,17 @@ class _AllProductsViewState extends State<AllProductsView> {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Product Name
                   Text(
                     product.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 11,
+                      fontSize: 12,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -498,20 +505,20 @@ class _AllProductsViewState extends State<AllProductsView> {
                           product.category ?? 'Unknown',
                           style: TextStyle(
                             color: Colors.grey[600],
-                            fontSize: 9,
+                            fontSize: 10,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.star, size: 10, color: Colors.amber[600]),
-                      const SizedBox(width: 1),
+                      const SizedBox(width: 8),
+                      Icon(Icons.star, size: 12, color: Colors.amber[600]),
+                      const SizedBox(width: 2),
                       Text(
                         '${product.rating}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 9,
+                          fontSize: 10,
                         ),
                       ),
                     ],
@@ -522,7 +529,7 @@ class _AllProductsViewState extends State<AllProductsView> {
                     '৳${product.price.toStringAsFixed(0)}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      fontSize: 14,
                       color: Color(0xFF2C3E50),
                     ),
                   ),
@@ -549,14 +556,14 @@ class _AllProductsViewState extends State<AllProductsView> {
                       : Colors.grey[400],
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 6),
                 ),
                 child: isLoading
                     ? const SizedBox(
-                        width: 14,
-                        height: 14,
+                        width: 16,
+                        height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -567,7 +574,7 @@ class _AllProductsViewState extends State<AllProductsView> {
                     : Text(
                         product.stock > 0 ? 'Add to Cart' : 'Out of Stock',
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -703,15 +710,76 @@ class _AllProductsViewState extends State<AllProductsView> {
     );
   }
 
-  void _addToWishlist(FirestoreProduct product) {
-    Get.snackbar(
-      'Wishlist',
-      '${product.name} added to wishlist',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-    );
+  void _addToWishlist(FirestoreProduct product) async {
+    try {
+      // Check if user is authenticated
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        Get.snackbar(
+          'Error',
+          'Please login to add items to wishlist',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+      if (!authController.isLoggedIn) {
+        Get.snackbar(
+          'Login Required',
+          'Please login to add items to wishlist',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+      }
+
+      // Add to wishlist using FirestoreService
+      final success = await FirestoreService.addToWishlistWithProduct(
+        authController.currentUser!.uid,
+        product.toMap(),
+      );
+
+      if (success) {
+        Get.snackbar(
+          'Wishlist',
+          '${product.name} added to wishlist',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+
+        // Notify wishlist controller to refresh if it's available
+        if (Get.isRegistered<WishlistController>()) {
+          final wishlistController = Get.find<WishlistController>();
+          wishlistController.refreshWishlist();
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to add item to wishlist',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      print('❌ Error adding to wishlist: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to add item to wishlist',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+    }
   }
 
   void _addToCart(FirestoreProduct product) {
