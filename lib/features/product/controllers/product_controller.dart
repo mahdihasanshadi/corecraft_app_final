@@ -99,4 +99,16 @@ class ProductController extends GetxController {
     _selectedCategory.value = '';
     _loadRelatedProducts();
   }
+
+  List<String> getAvailableCategories() {
+    // Extract unique categories from current products
+    final categories = _relatedProducts.map((p) => p.category).toSet().toList();
+    categories.sort();
+    return categories;
+  }
+
+  void toggleFavorite(FirestoreProduct product) {
+    // TODO: Implement favorite functionality
+    print('Toggle favorite for product: ${product.name}');
+  }
 }

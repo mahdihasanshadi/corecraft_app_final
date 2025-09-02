@@ -89,30 +89,54 @@ class MockAuthService {
 }
 
 // Mock User class
-class MockUser extends User {
-  MockUser({required String uid, required String email, String? displayName})
-    : super(
-        uid: uid,
-        email: email,
-        displayName: displayName,
-        isEmailVerified: true,
-        photoURL: null,
-        phoneNumber: null,
-        metadata: UserMetadata(
-          creationTime: DateTime.now(),
-          lastSignInTime: DateTime.now(),
-        ),
-      );
+class MockUser implements User {
+  MockUser({required this.uid, required this.email, this.displayName});
+
+  @override
+  final String uid;
+
+  @override
+  final String? email;
+
+  @override
+  final String? displayName;
+
+  @override
+  final bool isEmailVerified = true;
+
+  @override
+  final String? photoURL = null;
+
+  @override
+  final String? phoneNumber = null;
+
+  @override
+  final UserMetadata metadata = UserMetadata(
+    DateTime.now().millisecondsSinceEpoch,
+    DateTime.now().millisecondsSinceEpoch,
+  );
 
   @override
   Future<void> updateDisplayName(String? displayName) async {
     // Mock implementation
     print('Mock update display name: $displayName');
   }
+
+  // Implement other required User methods with mock behavior
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 // Mock UserCredential class
-class MockUserCredential extends UserCredential {
-  MockUserCredential(User user)
-    : super(user: user, additionalUserInfo: null, credential: null);
+class MockUserCredential implements UserCredential {
+  MockUserCredential(this.user);
+
+  @override
+  final User user;
+
+  @override
+  final AdditionalUserInfo? additionalUserInfo = null;
+
+  @override
+  final AuthCredential? credential = null;
 }

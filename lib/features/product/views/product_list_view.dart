@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/routes/app_routes.dart';
 import '../controllers/product_controller.dart';
-import '../models/product.dart';
+import '../models/firestore_product.dart';
 
 class ProductListView extends StatefulWidget {
   const ProductListView({super.key});
@@ -63,7 +63,9 @@ class _ProductListViewState extends State<ProductListView> {
   }
 
   void _sortProducts() {
-    final products = List<Product>.from(_productController.relatedProducts);
+    final products = List<FirestoreProduct>.from(
+      _productController.relatedProducts,
+    );
 
     switch (_sortBy) {
       case 'name':
@@ -296,7 +298,7 @@ class _ProductListViewState extends State<ProductListView> {
     );
   }
 
-  Widget _buildProductCard(Product product) {
+  Widget _buildProductCard(FirestoreProduct product) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -317,7 +319,9 @@ class _ProductListViewState extends State<ProductListView> {
                       top: Radius.circular(12),
                     ),
                     child: CachedNetworkImage(
-                      imageUrl: product.mainImage,
+                      imageUrl: product.images.isNotEmpty
+                          ? product.images.first
+                          : '',
                       fit: BoxFit.cover,
                       width: double.infinity,
                       placeholder: (context, url) => Container(
@@ -444,7 +448,7 @@ class _ProductListViewState extends State<ProductListView> {
     );
   }
 
-  Widget _buildProductListItem(Product product) {
+  Widget _buildProductListItem(FirestoreProduct product) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,

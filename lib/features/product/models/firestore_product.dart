@@ -167,4 +167,19 @@ class FirestoreProduct {
 
   // Get formatted price
   String get formattedPrice => '৳${displayPrice.toStringAsFixed(0)}';
+
+  // Get formatted original price
+  String? get formattedOriginalPrice =>
+      isOnSale ? '৳${price.toStringAsFixed(0)}' : null;
+
+  // Get discount percentage
+  double? get discountPercentage {
+    if (isOnSale && salePrice != null) {
+      return ((price - salePrice!) / price * 100);
+    }
+    return null;
+  }
+
+  // Get main image
+  String get mainImage => images.isNotEmpty ? images.first : '';
 }
