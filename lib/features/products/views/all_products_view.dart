@@ -685,26 +685,44 @@ class _AllProductsViewState extends State<AllProductsView> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: ElevatedButton(
-              onPressed: product['inStock'] ? () => _addToCart(product) : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: product['inStock']
-                    ? const Color(0xFF2C3E50)
-                    : Colors.grey[400],
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            child: Obx(() {
+              final cartController = Get.find<CartController>();
+              final isLoading = cartController.isProductLoading(product['id']);
+
+              return ElevatedButton(
+                onPressed: (product['inStock'] && !isLoading)
+                    ? () => _addToCart(product)
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (product['inStock'] && !isLoading)
+                      ? const Color(0xFF2C3E50)
+                      : Colors.grey[400],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-              ),
-              child: Text(
-                product['inStock'] ? 'Add to Cart' : 'Out of Stock',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        product['inStock'] ? 'Add to Cart' : 'Out of Stock',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              );
+            }),
           ),
         ],
       ),

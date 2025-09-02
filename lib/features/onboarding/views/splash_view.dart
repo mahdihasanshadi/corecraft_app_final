@@ -84,9 +84,9 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       // Ensure all services are ready before navigation
       await _ensureServicesReady();
 
-      // Check if user is logged in
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
+      // Check if user is logged in using the auth controller
+      final authController = Get.find<FirebaseAuthController>();
+      if (authController.isLoggedIn) {
         Get.offAllNamed('/home');
       } else {
         Get.offAllNamed('/login');

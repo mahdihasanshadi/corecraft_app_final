@@ -311,27 +311,49 @@ class HomeView extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       height: 26,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Add to cart functionality
-                          _addToCart(product);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                      child: Obx(() {
+                        final cartController = Get.find<CartController>();
+                        final isLoading = cartController.isProductLoading(
+                          product.id,
+                        );
+
+                        return ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  // Add to cart functionality
+                                  _addToCart(product);
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isLoading
+                                ? Colors.grey[400]
+                                : const Color(0xFF4CAF50),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 2),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                        ),
-                        child: const Text(
-                          'Add to Cart',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Add to Cart',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        );
+                      }),
                     ),
                   ],
                 ),

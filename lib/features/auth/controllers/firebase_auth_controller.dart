@@ -17,14 +17,52 @@ class FirebaseAuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Listen to auth state changes
-    FirebaseService.authStateChanges.listen((User? user) {
-      _user.value = user;
-      if (user != null) {
-        FirebaseService.setUserId(user.uid);
-        FirebaseService.setUserProperty('user_type', 'customer');
+    _initializeAuth();
+  }
+
+  Future<void> _initializeAuth() async {
+    try {
+      _isLoading.value = true;
+
+      // Check if there's a current user with valid token
+      final currentUser = FirebaseService.currentUser;
+      if (currentUser != null) {
+        // Verify token is still valid
+        try {
+          final token = await currentUser.getIdToken(
+            true,
+          ); // Force refresh to check validity
+          if (token != null && token.isNotEmpty) {
+            _user.value = currentUser;
+            FirebaseService.setUserId(currentUser.uid);
+            FirebaseService.setUserProperty('user_type', 'customer');
+            print('✅ User session restored: ${currentUser.email}');
+            return;
+          }
+        } catch (tokenError) {
+          print('❌ Token validation failed: $tokenError');
+          // Token is invalid, sign out and clear user
+          await FirebaseService.signOut();
+          _user.value = null;
+        }
       }
-    });
+
+      // Listen to auth state changes for future updates
+      FirebaseService.authStateChanges.listen((User? user) {
+        _user.value = user;
+        if (user != null) {
+          FirebaseService.setUserId(user.uid);
+          FirebaseService.setUserProperty('user_type', 'customer');
+          print('✅ Auth state changed - User logged in: ${user.email}');
+        } else {
+          print('ℹ️ Auth state changed - User logged out');
+        }
+      });
+    } catch (e) {
+      print('❌ Error initializing auth: $e');
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   // Sign Up

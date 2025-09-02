@@ -12,22 +12,19 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final authController = Get.put(FirebaseAuthController());
 
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        // Show loading while checking auth state
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashView();
-        }
-
-        // If user is logged in, show home
-        if (snapshot.hasData && snapshot.data != null) {
-          return const HomeView();
-        }
-
-        // If user is not logged in, show splash (which will redirect to login)
+    return Obx(() {
+      // Show loading while auth controller is initializing
+      if (authController.isLoading) {
         return const SplashView();
-      },
-    );
+      }
+
+      // If user is logged in, show home
+      if (authController.isLoggedIn) {
+        return const HomeView();
+      }
+
+      // If user is not logged in, show splash (which will redirect to login)
+      return const SplashView();
+    });
   }
 }

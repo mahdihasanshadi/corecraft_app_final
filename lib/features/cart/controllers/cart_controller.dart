@@ -10,11 +10,17 @@ class CartController extends GetxController {
   final _isLoading = false.obs;
   final _error = RxnString();
   final _isProcessing = false.obs;
+  final _loadingProducts =
+      <String>{}.obs; // Track which products are being added
 
   List<Map<String, dynamic>> get cartItems => _cartItems;
   bool get isLoading => _isLoading.value;
   String? get error => _error.value;
   bool get isProcessing => _isProcessing.value;
+
+  // Check if a specific product is being added to cart
+  bool isProductLoading(String productId) =>
+      _loadingProducts.contains(productId);
 
   // Computed properties
   int get itemCount =>
@@ -212,10 +218,21 @@ class CartController extends GetxController {
     String? selectedColor,
     int quantity = 1,
   }) async {
+    final productId = product['id']?.toString() ?? '';
+
+    // Check if already loading this product
+    if (_loadingProducts.contains(productId)) {
+      print('⚠️ Product $productId is already being added to cart');
+      return;
+    }
+
     try {
+      // Set loading state for this product
+      _loadingProducts.add(productId);
+
       print('=== DEBUG: Adding to cart ===');
       print('📦 Product: ${product['name'] ?? 'Unknown'}');
-      print('📦 Product ID: ${product['id']}');
+      print('📦 Product ID: $productId');
 
       // Get current user
       final authController = Get.find<FirebaseAuthController>();
@@ -239,7 +256,6 @@ class CartController extends GetxController {
         return;
       }
 
-      final productId = product['id']?.toString() ?? '';
       print('✅ User authenticated, product ID: $productId');
 
       // Check if item already exists in cart
@@ -317,6 +333,9 @@ class CartController extends GetxController {
         margin: const EdgeInsets.all(16),
         borderRadius: 8,
       );
+    } finally {
+      // Always remove loading state for this product
+      _loadingProducts.remove(productId);
     }
   }
 
