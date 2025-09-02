@@ -363,7 +363,7 @@ class _AllProductsViewState extends State<AllProductsView> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -404,7 +404,9 @@ class _AllProductsViewState extends State<AllProductsView> {
                         _selectedCategory = category;
                       });
                     },
-                    selectedColor: const Color(0xFF2C3E50).withOpacity(0.2),
+                    selectedColor: const Color(
+                      0xFF2C3E50,
+                    ).withValues(alpha: 0.2),
                     checkmarkColor: const Color(0xFF2C3E50),
                   ),
                 )
@@ -530,7 +532,7 @@ class _AllProductsViewState extends State<AllProductsView> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.75,
+        childAspectRatio: 0.85,
       ),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
@@ -547,7 +549,7 @@ class _AllProductsViewState extends State<AllProductsView> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -576,7 +578,7 @@ class _AllProductsViewState extends State<AllProductsView> {
                   if (!product['inStock'])
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(16),
                         ),

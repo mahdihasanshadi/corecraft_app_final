@@ -50,9 +50,13 @@ class CartController extends GetxController {
       _isLoading.value = true;
       _error.value = null;
 
+      print('=== DEBUG: Loading cart items ===');
+
       // Check if FirebaseAuthController is available
       if (!Get.isRegistered<FirebaseAuthController>()) {
-        print('FirebaseAuthController not registered yet, skipping cart load');
+        print(
+          '❌ FirebaseAuthController not registered yet, skipping cart load',
+        );
         _cartItems.clear();
         return;
       }
@@ -61,9 +65,16 @@ class CartController extends GetxController {
       final authController = Get.find<FirebaseAuthController>();
       final user = authController.currentUser;
 
+      print('🔍 Current user: ${user?.uid ?? "NULL"}');
+      print('🔍 User email: ${user?.email ?? "NULL"}');
+
       if (user != null) {
+        print('✅ User authenticated, loading cart from Firestore...');
+
         // Load cart from Firestore
         final cartData = await FirestoreService.getCartItems(user.uid);
+        print('📦 Raw cart data from Firestore: ${cartData.length} items');
+        print('📦 Cart data details: $cartData');
 
         // Validate and clean the data
         final cleanedData = cartData
@@ -71,44 +82,106 @@ class CartController extends GetxController {
             .toList();
         _cartItems.value = cleanedData;
 
-        print('Loaded ${cartData.length} cart items for user ${user.uid}');
+        print('✅ Loaded ${cartData.length} cart items for user ${user.uid}');
+        print('✅ Cleaned cart items: ${_cartItems.length}');
       } else {
-        // User not logged in, clear cart
+        print('❌ User not logged in, clearing cart');
         _cartItems.clear();
       }
     } catch (e) {
-      print('Error loading cart: $e');
+      print('❌ Error loading cart: $e');
       _error.value = e.toString();
       _cartItems.clear();
     } finally {
       _isLoading.value = false;
+      print('=== DEBUG: Cart loading complete ===');
     }
   }
 
   // Clean and validate cart item data
   Map<String, dynamic> _cleanCartItem(Map<String, dynamic> item) {
+    // Handle both Map and FirestoreProduct types for the product field
+    dynamic product = item['product'];
+
+    // Extract product data based on type
+    String name;
+    double price;
+    double? salePrice;
+    String image;
+    List<dynamic> images;
+    String category;
+    String brand;
+    List<dynamic> sizes;
+    List<dynamic> colors;
+    String material;
+    String fitType;
+    int stock;
+
+    if (product is Map<String, dynamic>) {
+      // Product is a Map (from addToCart)
+      name = product['name']?.toString() ?? 'Unknown Product';
+      price = _parseDouble(product['price']) ?? 0.0;
+      salePrice = _parseDouble(product['salePrice']);
+      image = product['images']?[0]?.toString() ?? '';
+      images = (product['images'] is List) ? (product['images'] as List) : [];
+      category = product['category']?.toString() ?? 'Unknown Category';
+      brand = product['brand']?.toString() ?? '';
+      sizes = (product['sizes'] is List) ? (product['sizes'] as List) : [];
+      colors = (product['colors'] is List) ? (product['colors'] as List) : [];
+      material = product['material']?.toString() ?? '';
+      fitType = product['fitType']?.toString() ?? '';
+      stock = _parseInt(product['stock']) ?? 0;
+    } else {
+      // Product is a FirestoreProduct object (from getCartItems)
+      // Import the FirestoreProduct class to access its properties
+      try {
+        // Use dynamic access for now, but we should import the proper class
+        name = product.name?.toString() ?? 'Unknown Product';
+        price = product.price ?? 0.0;
+        salePrice = product.salePrice;
+        image = product.images.isNotEmpty ? product.images.first : '';
+        images = product.images;
+        category = product.category ?? 'Unknown Category';
+        brand = product.brand ?? '';
+        sizes = product.sizes;
+        colors = product.colors;
+        material = product.material ?? '';
+        fitType = product.fitType ?? '';
+        stock = product.stock ?? 0;
+      } catch (e) {
+        print('❌ Error accessing FirestoreProduct properties: $e');
+        // Fallback to default values
+        name = 'Unknown Product';
+        price = 0.0;
+        salePrice = null;
+        image = '';
+        images = [];
+        category = 'Unknown Category';
+        brand = '';
+        sizes = [];
+        colors = [];
+        material = '';
+        fitType = '';
+        stock = 0;
+      }
+    }
+
     return {
       'id': item['id']?.toString() ?? '',
-      'productId': item['productId']?.toString() ?? '',
-      'name': item['product']?['name']?.toString() ?? 'Unknown Product',
-      'price': _parseDouble(item['product']?['price']) ?? 0.0,
-      'salePrice': _parseDouble(item['product']?['salePrice']),
-      'image': item['product']?['images']?[0]?.toString() ?? '',
-      'images': (item['product']?['images'] is List)
-          ? (item['product']?['images'] as List)
-          : [],
-      'category':
-          item['product']?['category']?.toString() ?? 'Unknown Category',
-      'brand': item['product']?['brand']?.toString() ?? '',
-      'sizes': (item['product']?['sizes'] is List)
-          ? (item['product']?['sizes'] as List)
-          : [],
-      'colors': (item['product']?['colors'] is List)
-          ? (item['product']?['colors'] as List)
-          : [],
-      'material': item['product']?['material']?.toString() ?? '',
-      'fitType': item['product']?['fitType']?.toString() ?? '',
-      'stock': _parseInt(item['product']?['stock']) ?? 0,
+      'productId':
+          item['productId']?.toString() ?? item['id']?.toString() ?? '',
+      'name': name,
+      'price': price,
+      'salePrice': salePrice,
+      'image': image,
+      'images': images,
+      'category': category,
+      'brand': brand,
+      'sizes': sizes,
+      'colors': colors,
+      'material': material,
+      'fitType': fitType,
+      'stock': stock,
       'quantity': _parseInt(item['quantity']) ?? 1,
       'selectedSize': item['selectedSize']?.toString() ?? '',
       'selectedColor': item['selectedColor']?.toString() ?? '',
@@ -140,11 +213,19 @@ class CartController extends GetxController {
     int quantity = 1,
   }) async {
     try {
+      print('=== DEBUG: Adding to cart ===');
+      print('📦 Product: ${product['name'] ?? 'Unknown'}');
+      print('📦 Product ID: ${product['id']}');
+
       // Get current user
       final authController = Get.find<FirebaseAuthController>();
       final user = authController.currentUser;
 
+      print('🔍 Current user: ${user?.uid ?? "NULL"}');
+      print('🔍 User email: ${user?.email ?? "NULL"}');
+
       if (user == null) {
+        print('❌ User not authenticated, showing login required message');
         Get.snackbar(
           'Login Required',
           'Please login to add items to cart',
@@ -159,6 +240,7 @@ class CartController extends GetxController {
       }
 
       final productId = product['id']?.toString() ?? '';
+      print('✅ User authenticated, product ID: $productId');
 
       // Check if item already exists in cart
       final existingIndex = _cartItems.indexWhere(
@@ -169,12 +251,15 @@ class CartController extends GetxController {
       );
 
       if (existingIndex != -1) {
+        print('🔄 Item already exists, updating quantity...');
         // Update quantity of existing item
         await updateQuantity(
           existingIndex,
           _cartItems[existingIndex]['quantity'] + quantity,
         );
       } else {
+        print('➕ Adding new item to cart...');
+
         // Add to local list FIRST
         final cleanedProduct = _cleanCartItem({
           'id': productId,
@@ -187,17 +272,17 @@ class CartController extends GetxController {
         });
 
         _cartItems.add(cleanedProduct);
-        print('Added to cart locally: ${cleanedProduct['name']}');
-        print('Cart items count: ${_cartItems.length}');
+        print('✅ Added to cart locally: ${cleanedProduct['name']}');
+        print('✅ Cart items count: ${_cartItems.length}');
 
         // Then add to Firestore
-        print('Attempting to save to Firestore...');
+        print('💾 Attempting to save to Firestore...');
         final success = await FirestoreService.addToCart(
           user.uid,
           productId,
           quantity,
         );
-        print('Firestore save result: $success');
+        print('💾 Firestore save result: $success');
 
         if (!success) {
           // If Firestore fails, remove from local list
