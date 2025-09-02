@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "197386697750",
+    "project_id": "core-craft-clothing",
+    "storage_bucket": "core-craft-clothing.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197386697750:android:b3266e57a91c00d56b4937",
+        "android_client_info": {
+          "package_name": "com.example.core_craft_ecommerce"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY5cZy-RUQrTuZMBi8MRQKZTbr8YRcZ-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
