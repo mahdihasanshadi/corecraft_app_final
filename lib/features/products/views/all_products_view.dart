@@ -599,7 +599,7 @@ class _AllProductsViewState extends State<AllProductsView> {
                     right: 8,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: IconButton(
@@ -618,72 +618,60 @@ class _AllProductsViewState extends State<AllProductsView> {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Product Name
-                  Text(
-                    product['name'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Category
-                  Text(
-                    product['category'],
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Rating
-                  Row(
+                  // Product details
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.star, size: 14, color: Colors.amber[600]),
-                      const SizedBox(width: 2),
+                      // Product Name
                       Text(
-                        '${product['rating']}',
+                        product['name'],
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '(${product['reviews']})',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                      const SizedBox(height: 2),
 
-                  // Price
-                  Row(
-                    children: [
+                      // Category and Rating in one row
+                      Row(
+                        children: [
+                          Text(
+                            product['category'],
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 10,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.star, size: 12, color: Colors.amber[600]),
+                          const SizedBox(width: 2),
+                          Text(
+                            '${product['rating']}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+
+                      // Price
                       Text(
                         '৳${product['price'].toStringAsFixed(0)}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Color(0xFF2C3E50),
                         ),
                       ),
-                      if (product['originalPrice'] != null) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          '৳${product['originalPrice'].toStringAsFixed(0)}',
-                          style: TextStyle(
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey[500],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ],

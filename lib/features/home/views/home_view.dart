@@ -4,6 +4,7 @@ import '../../../core/widgets/logo_widget.dart';
 import '../../../core/widgets/app_drawer.dart';
 
 import '../../wishlist/controllers/wishlist_controller.dart';
+import '../../cart/controllers/cart_controller.dart';
 import '../../product/controllers/firestore_product_controller.dart';
 import '../../product/models/firestore_product.dart';
 
@@ -275,7 +276,7 @@ class HomeView extends StatelessWidget {
             Expanded(
               flex: 3,
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,18 +290,18 @@ class HomeView extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleSmall
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 1),
                         Text(
                           product.formattedPrice,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: const Color(0xFF4CAF50),
                               ),
                         ),
@@ -309,11 +310,11 @@ class HomeView extends StatelessWidget {
                     // Add to Cart Button
                     SizedBox(
                       width: double.infinity,
-                      height: 28,
+                      height: 26,
                       child: ElevatedButton(
                         onPressed: () {
                           // Add to cart functionality
-                          Get.snackbar('Success', 'Added to cart');
+                          _addToCart(product);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4CAF50),
@@ -321,12 +322,12 @@ class HomeView extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 2),
                         ),
                         child: const Text(
                           'Add to Cart',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -663,7 +664,7 @@ class HomeView extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.82,
               ),
               itemCount: firestoreController.featuredProducts.length,
               itemBuilder: (context, index) {
@@ -677,6 +678,39 @@ class HomeView extends StatelessWidget {
         }),
       ],
     );
+  }
+
+  void _addToCart(FirestoreProduct product) {
+    if (!Get.isRegistered<CartController>()) {
+      Get.snackbar('Error', 'Cart service not available');
+      return;
+    }
+    final cartController = Get.find<CartController>();
+    final productMap = {
+      'id': product.id,
+      'name': product.name,
+      'description': product.description,
+      'price': product.price,
+      'image': product.images.isNotEmpty
+          ? product.images.first
+          : 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300&h=300&fit=crop',
+      'images': product.images,
+      'category': product.category,
+      'brand': product.brand,
+      'sizes': product.sizes,
+      'colors': product.colors,
+      'material': product.material,
+      'fitType': product.fitType,
+      'careInstructions': product.careInstructions,
+      'stock': product.stock,
+      'rating': product.rating,
+      'reviewCount': product.reviewCount,
+      'isFeatured': product.isFeatured,
+      'isNew': product.isNew,
+      'isOnSale': product.isOnSale,
+      'salePrice': product.salePrice,
+    };
+    cartController.addToCart(productMap);
   }
 
   void _addToWishlist(FirestoreProduct product) {

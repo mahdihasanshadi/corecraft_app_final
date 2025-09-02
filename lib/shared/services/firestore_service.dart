@@ -159,6 +159,13 @@ class FirestoreService {
     int quantity,
   ) async {
     try {
+      // First get the product details
+      final product = await getProductById(productId);
+      if (product == null) {
+        print('Product not found: $productId');
+        return false;
+      }
+
       await _firestore
           .collection('users')
           .doc(userId)
@@ -167,6 +174,7 @@ class FirestoreService {
           .set({
             'productId': productId,
             'quantity': quantity,
+            'product': product.toMap(), // Store full product data
             'addedAt': Timestamp.fromDate(DateTime.now()),
             'updatedAt': Timestamp.fromDate(DateTime.now()),
           });
