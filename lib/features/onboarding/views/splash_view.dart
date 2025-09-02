@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/routes/app_routes.dart';
-import '../../home/controllers/home_controller.dart';
-import '../../auth/controllers/firebase_auth_controller.dart';
-import '../../product/controllers/product_controller.dart';
 import '../../../core/widgets/logo_widget.dart';
 
 class SplashView extends StatefulWidget {
@@ -84,16 +77,11 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
       // Ensure all services are ready before navigation
       await _ensureServicesReady();
 
-      // Check if user is logged in using the auth controller
-      final authController = Get.find<FirebaseAuthController>();
-      if (authController.isLoggedIn) {
-        Get.offAllNamed('/home');
-      } else {
-        Get.offAllNamed('/login');
-      }
+      // Let AuthWrapper handle navigation - don't navigate from here
+      print('✅ Splash animation complete, AuthWrapper will handle navigation');
     } catch (e) {
-      // Fallback navigation
-      Get.offAllNamed('/login');
+      print('❌ Error in splash sequence: $e');
+      // Don't navigate - let AuthWrapper handle it
     }
   }
 
@@ -154,7 +142,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(35),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
+                                    color: Colors.black.withValues(alpha: 0.3),
                                     blurRadius: 30,
                                     offset: const Offset(0, 15),
                                   ),
@@ -202,7 +190,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             'Premium Clothing Brand',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   letterSpacing: 1.2,
                                   fontSize: 16,
                                 ),
@@ -223,7 +211,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(25),
                             ),
                             child: const Center(
@@ -255,7 +243,7 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                             'Loading...',
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   letterSpacing: 1,
                                 ),
                           ),
@@ -277,7 +265,7 @@ class BackgroundPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
+      ..color = Colors.white.withValues(alpha: 0.05)
       ..strokeWidth = 1;
 
     // Draw diagonal lines
@@ -287,7 +275,7 @@ class BackgroundPatternPainter extends CustomPainter {
 
     // Draw circles
     final circlePaint = Paint()
-      ..color = Colors.white.withOpacity(0.03)
+      ..color = Colors.white.withValues(alpha: 0.03)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(

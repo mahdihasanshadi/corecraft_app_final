@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../controllers/firebase_auth_controller.dart';
 import '../../onboarding/views/splash_view.dart';
 import '../../home/views/home_view.dart';
+import '../views/login_view.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -23,8 +23,8 @@ class AuthWrapper extends StatelessWidget {
         return const HomeView();
       }
 
-      // If user is not logged in, show splash (which will redirect to login)
-      return const SplashView();
+      // If user is not logged in, show login directly
+      return const LoginView();
     });
   }
 }

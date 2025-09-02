@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../../../shared/services/firebase_service.dart';
+import '../../cart/controllers/cart_controller.dart';
 
 class FirebaseAuthController extends GetxController {
   final Rx<User?> _user = Rx<User?>(null);
@@ -37,6 +38,10 @@ class FirebaseAuthController extends GetxController {
             FirebaseService.setUserId(currentUser.uid);
             FirebaseService.setUserProperty('user_type', 'customer');
             print('✅ User session restored: ${currentUser.email}');
+            print('✅ Auth initialization complete - User authenticated');
+
+            // Notify cart controller that auth is complete
+            _notifyCartController();
             return;
           }
         } catch (tokenError) {
@@ -54,10 +59,15 @@ class FirebaseAuthController extends GetxController {
           FirebaseService.setUserId(user.uid);
           FirebaseService.setUserProperty('user_type', 'customer');
           print('✅ Auth state changed - User logged in: ${user.email}');
+
+          // Notify cart controller that user is now authenticated
+          _notifyCartController();
         } else {
           print('ℹ️ Auth state changed - User logged out');
         }
       });
+
+      print('✅ Auth initialization complete - No current user');
     } catch (e) {
       print('❌ Error initializing auth: $e');
     } finally {
@@ -262,6 +272,18 @@ class FirebaseAuthController extends GetxController {
       return 'Network error. Please check your internet connection.';
     } else {
       return 'An error occurred. Please try again.';
+    }
+  }
+
+  // Notify cart controller that auth is complete
+  void _notifyCartController() {
+    try {
+      if (Get.isRegistered<CartController>()) {
+        final cartController = Get.find<CartController>();
+        cartController.loadCartIfAuthenticated();
+      }
+    } catch (e) {
+      print('⚠️ Could not notify cart controller: $e');
     }
   }
 }

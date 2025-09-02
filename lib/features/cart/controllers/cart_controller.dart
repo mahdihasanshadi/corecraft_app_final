@@ -22,6 +22,25 @@ class CartController extends GetxController {
   bool isProductLoading(String productId) =>
       _loadingProducts.contains(productId);
 
+  // Method to manually trigger cart loading (called when auth is complete)
+  Future<void> loadCartIfAuthenticated() async {
+    try {
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        print('❌ FirebaseAuthController not registered, cannot load cart');
+        return;
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+      if (authController.isLoggedIn) {
+        print('✅ Auth complete, loading cart...');
+        await _loadCartItems();
+        _setupRealtimeListener();
+      }
+    } catch (e) {
+      print('❌ Error in loadCartIfAuthenticated: $e');
+    }
+  }
+
   // Computed properties
   int get itemCount =>
       _cartItems.fold(0, (sum, item) => sum + (item['quantity'] as int? ?? 1));
@@ -38,11 +57,45 @@ class CartController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Load cart from Firebase if user is logged in
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _loadCartItems();
-      _setupRealtimeListener();
+    // Wait for auth controller to be ready and user to be authenticated
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _waitForAuthAndLoadCart();
     });
+  }
+
+  Future<void> _waitForAuthAndLoadCart() async {
+    try {
+      // Wait for FirebaseAuthController to be registered and initialized
+      if (!Get.isRegistered<FirebaseAuthController>()) {
+        print('⏳ Waiting for FirebaseAuthController to be registered...');
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (!Get.isRegistered<FirebaseAuthController>()) {
+          print(
+            '❌ FirebaseAuthController still not registered, skipping cart load',
+          );
+          return;
+        }
+      }
+
+      final authController = Get.find<FirebaseAuthController>();
+
+      // Wait for auth controller to finish initializing
+      if (authController.isLoading) {
+        print('⏳ Waiting for FirebaseAuthController to finish initializing...');
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      // Now check if user is authenticated
+      if (authController.isLoggedIn) {
+        print('✅ User is authenticated, loading cart...');
+        await _loadCartItems();
+        _setupRealtimeListener();
+      } else {
+        print('ℹ️ User not authenticated, skipping cart load');
+      }
+    } catch (e) {
+      print('❌ Error in _waitForAuthAndLoadCart: $e');
+    }
   }
 
   void _setupRealtimeListener() {
