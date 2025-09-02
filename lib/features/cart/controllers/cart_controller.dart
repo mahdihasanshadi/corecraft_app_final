@@ -10,7 +10,6 @@ class CartController extends GetxController {
   final _isLoading = false.obs;
   final _error = RxnString();
   final _isProcessing = false.obs;
-  final _realtimeEnabled = true.obs;
 
   List<Map<String, dynamic>> get cartItems => _cartItems;
   bool get isLoading => _isLoading.value;
@@ -299,6 +298,8 @@ class CartController extends GetxController {
 
       // Remove from local list
       _cartItems.removeAt(index);
+      // Force reload from Firestore to ensure UI is up to date
+      await _loadCartItems();
 
       Get.snackbar(
         'Removed from Cart',

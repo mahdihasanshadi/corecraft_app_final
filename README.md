@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Core Craft Clothing
 
 A modern, feature-rich Flutter e-commerce application for a premium clothing brand, built with clean architecture principles and GetX state management.
@@ -334,3 +335,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ by the Core Craft Team**
+=======
+# corecraft_app
+>>>>>>> 5ff65193372a6a9bc6206ecbc6987e593bdf60b1

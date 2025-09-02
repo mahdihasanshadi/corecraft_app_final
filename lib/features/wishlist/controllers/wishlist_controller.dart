@@ -8,7 +8,6 @@ class WishlistController extends GetxController {
   final _wishlistItems = <Map<String, dynamic>>[].obs;
   final _isLoading = false.obs;
   final _isProcessing = false.obs;
-  final _realtimeEnabled = true.obs;
 
   List<Map<String, dynamic>> get wishlistItems => _wishlistItems;
   bool get isLoading => _isLoading.value;
@@ -162,9 +161,9 @@ class WishlistController extends GetxController {
           user.uid,
           cleanedProduct,
         );
-  print('Firestore addToWishlistWithProduct result: $success');
-  // Force reload from Firestore to ensure UI is up to date
-  await _loadWishlistItems();
+        print('Firestore addToWishlistWithProduct result: $success');
+        // Force reload from Firestore to ensure UI is up to date
+        await _loadWishlistItems();
 
         if (!success) {
           // If Firestore fails, remove from local list
@@ -239,9 +238,9 @@ class WishlistController extends GetxController {
 
         // Remove from Firestore
         await FirestoreService.removeFromWishlist(user.uid, productId);
-  print('Removed from Firestore: $productId');
-  // Force reload from Firestore to ensure UI is up to date
-  await _loadWishlistItems();
+        print('Removed from Firestore: $productId');
+        // Force reload from Firestore to ensure UI is up to date
+        await _loadWishlistItems();
 
         // Remove from local list
         _wishlistItems.removeAt(index);
